@@ -13,7 +13,7 @@
 /*
  * Prototipos de Funciones en C
   * */
-#define BITSAT 12
+
 
 void zeros_c (uint32_t * vector, uint32_t longitud);
 void productoEscalar32_c (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar);
@@ -46,15 +46,13 @@ void corr_asm (int16_t *vectorX, int16_t *vectorY, int16_t vectorCorr, uint32_t 
   * @retval int
   */
 
-uint32_t vector_prueba32_in[10]={1,1,1,1,1,1,1,1,1,1};
-uint32_t vector_prueba32_out[10]={1,1,1,1,1,1,1,1,1,1};
-uint16_t vector_prueba16_in[10]={1,1,1,1,1,1,1,1,1,1};
-uint16_t vector_prueba16_out[10]={1,1,1,1,1,1,1,1,1,1};
+uint32_t vector_prueba_in[10]={1,1,1,1,1,1,1,1,1,1};
+uint32_t vector_prueba_out[10]={1,1,1,1,1,1,1,1,1,1};
 
 int main(void){
   init();
-  //zeros_c(vector_prueba32_in,10);
-  //productoEscalar32_c(vector_prueba32_in,vector_prueba32_out,10,3);
+  //zeros_c(vector_prueba_in,10);
+  productoEscalar32_c(vector_prueba_in,vector_prueba_out,10,3);
   for (;;){
 
   }
@@ -69,24 +67,13 @@ void productoEscalar32_c (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t lo
 	while(longitud--)*(vectorOut++)=(*vectorIn)*escalar;
 
 }
-void productoEscalar16_c (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar){
-	while(longitud--)*(vectorOut++)=(*vectorIn)*escalar;
-}
-void productoEscalar12_c (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar){
-	while(longitud--){
-		*(vectorOut++)=((*vectorIn)*escalar)>((1<<BITSAT)-1)?((1<<BITSAT)-1):((*vectorIn)*escalar);
-	}
-
-}
+void productoEscalar16_c (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar){}
+void productoEscalar12_c (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar){}
 void filtroVentana10_c(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitudVectorIn){}
 void pack32to16_c (int32_t * vectorIn, int16_t *vectorOut, uint32_t longitud){}
-
 int32_t max_c (int32_t * vectorIn, uint32_t longitud){
-	int32_t maximo=*vectorIn;
-	while(longitud--)if(maximo<*vectorIn)maximo=*vectorIn;
 	return 0;
 }
-
 void downsampleM_c (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N){}
 void invertir_c (uint16_t * vector, uint32_t longitud){}
 void corr_c (int16_t *vectorX, int16_t *vectorY, int16_t vectorCorr, uint32_t longitud){}
