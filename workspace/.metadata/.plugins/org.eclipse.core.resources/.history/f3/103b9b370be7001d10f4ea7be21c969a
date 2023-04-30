@@ -1,0 +1,14 @@
+/*
+ * init.h
+ *
+ *  Created on: Apr 30, 2023
+ *      Author: ipave
+ */
+
+#ifndef INC_INIT_H_
+#define INC_INIT_H_
+
+void SystemClock_Config(void);
+
+
+#endif /* INC_INIT_H_ */

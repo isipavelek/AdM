@@ -1,0 +1,7 @@
+init.c:33:6:init	1
+init.c:46:13:SystemClock_Config	3
+init.c:80:13:MX_ETH_Init	2
+init.c:111:13:MX_USART3_UART_Init	2
+init.c:130:13:MX_USB_OTG_FS_PCD_Init	2
+init.c:153:13:MX_GPIO_Init	1
+init.c:206:6:Error_Handler	1
