@@ -46,7 +46,7 @@ void corr_asm (int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr, uint32_t
   * @retval int
   */
 
-int32_t vector_prueba32_in[10]={1,1,-2,1,-4,10,8,5,3,3};
+uint16_t vector_prueba32_in[]={1,2,3,4,5,6,7,8,9,10,11};
 uint32_t vector_prueba32_out[10]={1,1,1,1,1,1,1,1,1,1};
 uint16_t vector_prueba16_in[10]={1,1,1,1,1,1,1,1,1,1};
 uint16_t vector_prueba16_out[10]={1,1,1,1,1,1,1,1,1,1};
@@ -56,10 +56,9 @@ int main(void){
   //productoEscalar32_asm(vector_prueba32_in,vector_prueba32_out,10,5);
   //productoEscalar32_c(vector_prueba32_in,vector_prueba32_out,10,3);
 
-  uint32_t valor=max_c(vector_prueba32_in,10);
+  invertir_asm(vector_prueba32_in,11);
 
   for (;;){
-	valor=valor+1;
   }
 
 }
@@ -188,7 +187,7 @@ void productoEscalar12_asm (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t 
 	__asm volatile("\n loop4:\n");
 	__asm volatile("		\t LDR R4,[R2],+4");
 	__asm volatile("		\t MUL R6,R4,R1");
-	__asm volatile("		\t SSAT R6,#16,R6");
+	__asm volatile("		\t USAT R6,#16,R6");
 	/*__asm volatile("		\t CMP R0,#(1<<12)");
 	__asm volatile("		\t BLO sigo");
 	__asm volatile("		\t MOV R6,#(1<<12)");
@@ -226,7 +225,57 @@ int32_t max_asm (int32_t * vectorIn, uint32_t longitud){
 	__asm volatile("		\n\t MOV %0,R2": "=r"(max));
 	return max;
 }
-void downsampleM_asm (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N){}
-void invertir_asm (uint16_t * vector, uint32_t longitud){}
+void downsampleM_asm (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N){
+
+		__asm volatile("		\t MOV R0, %0" :: "r"(longitud));
+		__asm volatile("		\t MOV R1, %0" :: "r"(N));
+		__asm volatile("		\t MOV R2, %0" :: "r"(vectorIn));
+		__asm volatile("		\t MOV R3, %0" :: "r"(vectorOut));
+
+		__asm volatile("		\t LDR R3,[R2],+4");
+		__asm volatile("		\t ADD R2,#+4");
+		__asm volatile("\n restando:\n");
+		__asm volatile("		\t MOV R4,R0");
+		__asm volatile("		\t SUB R4,%0"::"r"(longitud));
+		__asm volatile("		\t CMP R4,#0");
+		__asm volatile("		\t BGT restando");
+		__asm volatile("		\t BEQ restocero");
+		__asm volatile("		\t BLO restonocero");
+		__asm volatile("\n restocero:\n");
+		__asm volatile("		\t ADD R2,#+4");
+		__asm volatile("		\t B   seguimos");
+		__asm volatile("\n restonocero:\n");
+		__asm volatile("		\t LDR R3,[R2],+4");
+		__asm volatile("		\t ADD R2,#+4");
+		__asm volatile("\n seguimos:\n");
+		__asm volatile("		\n\t SUB R0,#1");
+		__asm volatile("		\n\t CMP R0,#0");
+		__asm volatile("		\n\t BNE restando");
+
+
+
+}
+
+
+void invertir_asm (uint16_t * vector, uint32_t longitud){
+
+	__asm volatile("		\t MOV R0, %0" :: "r"(longitud));
+	__asm volatile("		\t MOV R2, %0" :: "r"(vector));
+	__asm volatile("		\t MOV R1, #2");
+	__asm volatile("		\t RSB R3,R1,R0,LSL #1");
+	__asm volatile("		\t MOV R0,R0,LSR #1 ");
+	__asm volatile("\n loop7:\n");
+	__asm volatile("		\t LDRH R4, [R2,R3]");
+	__asm volatile("		\t LDRH R1, [R2]");
+	__asm volatile("		\t STRH R1, [R2,R3]");
+	__asm volatile("		\t MOV  R1, R4");
+	__asm volatile("		\t STRH R1, [R2],#+2");
+	__asm volatile("		\t SUB  R3, #4");
+	__asm volatile("		\t SUB R0,R0,#1");
+	__asm volatile("		\t CMP R0,#0");
+	__asm volatile("		\t BNE loop7");
+
+
+}
 void corr_asm (int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr, uint32_t longitud){}
 
