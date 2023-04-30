@@ -113,16 +113,25 @@ void invertir_c (uint16_t * vector, uint32_t longitud){
 	}
 }
 void corr_c (int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr, uint32_t longitud){
+	while(longitud--){
+		*(vectorCorr++)=*(vectorX++)* (*(vectorY+longitud));
 
+	}
 	int16_t sxy;
-    uint32_t delay,i,j;
-    for(delay = -longitud + 1; delay < longitud; delay++){
+    uint32_t    delay,i,j;
+
+    for(delay = -longitud + 1; delay < longitud; delay++)
+    {
+        //Calculate the numerator
         sxy = 0;
         for(i=0; i<longitud; i++){
             j = i + delay;
-            if((j < 0) || (j >= longitud))continue;
-            else sxy += (vectorX[i] * vectorY[j]);
+            if((j < 0) || (j >= N))
+                continue;
+            else
+                sxy += (vectorX[i] * vectorY[j]);
         }
+
         vectorCorr[delay + longitud - 1] = sxy;
     }
 }
@@ -139,5 +148,5 @@ int32_t max_asm (int32_t * vectorIn, uint32_t longitud){
 }
 void downsampleM_asm (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N){}
 void invertir_asm (uint16_t * vector, uint32_t longitud){}
-void corr_asm (int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr, uint32_t longitud){}
+void corr_asm (int16_t *vectorX, int16_t *vectorY, int16_t vectorCorr, uint32_t longitud){}
 
