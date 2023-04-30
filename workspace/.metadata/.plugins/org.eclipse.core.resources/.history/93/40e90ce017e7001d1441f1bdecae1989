@@ -66,19 +66,15 @@ void zeros_c (uint32_t * vector, uint32_t longitud){
 	while(longitud--)*(vector++)=0;
 }
 void productoEscalar32_c (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar){
-	while(longitud--)*(vectorOut++)=(*vectorIn++)*escalar;
+	while(longitud--)*(vectorOut++)=(*vectorIn)*escalar;
 
 }
 void productoEscalar16_c (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar){
-	while(longitud--)*(vectorOut++)=(*vectorIn++)*escalar;
+	while(longitud--)*(vectorOut++)=(*vectorIn)*escalar;
 }
 void productoEscalar12_c (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar){
 	while(longitud--){
-		if(((*vectorIn)*escalar)>((1<<BITSAT)-1)){
-			*(vectorOut++)=((1<<BITSAT)-1);
-			vectorIn++;
-		}else *(vectorOut++)=*(vectorIn++);
-
+		*(vectorOut++)=((*vectorIn)*escalar)>((1<<BITSAT)-1)?((1<<BITSAT)-1):((*vectorIn)*escalar);
 	}
 
 }
@@ -87,18 +83,12 @@ void pack32to16_c (int32_t * vectorIn, int16_t *vectorOut, uint32_t longitud){}
 
 int32_t max_c (int32_t * vectorIn, uint32_t longitud){
 	int32_t maximo=*vectorIn;
-	while(longitud--)if(maximo<*(vectorIn++))maximo=*vectorIn;
+	while(longitud--)if(maximo<*vectorIn)maximo=*vectorIn;
 	return maximo;
 }
 
 void downsampleM_c (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N){
-	*(vectorOut++)=*(vectorIn++);
-	while(--longitud){
-		if(!(longitud%N))vectorIn++;
-		else*(vectorOut++)=*(vectorIn++);
-
-	}
-
+	//while(longitud--)if(maximo<*vectorIn)maximo=*vectorIn;
 
 
 }
