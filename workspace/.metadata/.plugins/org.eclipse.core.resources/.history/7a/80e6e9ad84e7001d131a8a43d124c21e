@@ -1,0 +1,156 @@
+/**
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  ******************************************************************************
+  */
+
+
+#include "init.h"
+
+/*
+ * Prototipos de Funciones en C
+  * */
+#define BITSAT 12
+
+void zeros_c (uint32_t * vector, uint32_t longitud);
+void productoEscalar32_c (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar);
+void productoEscalar16_c (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar);
+void productoEscalar12_c (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar);
+void filtroVentana10_c(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitudVectorIn);
+void pack32to16_c (int32_t * vectorIn, int16_t *vectorOut, uint32_t longitud);
+int32_t max_c (int32_t * vectorIn, uint32_t longitud);
+void downsampleM_c (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N);
+void invertir_c (uint16_t * vector, uint32_t longitud);
+void corr_c (int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr, uint32_t longitud);
+/*
+ * Prototipos de Funciones en Assembly
+  * */
+
+void zeros_asm (uint32_t * vector, uint32_t longitud);
+void productoEscalar32_asm (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar);
+void productoEscalar16_asm (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar);
+void productoEscalar12_asm (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar);
+void filtroVentana10_asm(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitudVectorIn);
+void pack32to16_asm (int32_t * vectorIn, int16_t *vectorOut, uint32_t longitud);
+int32_t max_asm (int32_t * vectorIn, uint32_t longitud);
+void downsampleM_asm (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N);
+void invertir_asm (uint16_t * vector, uint32_t longitud);
+void corr_asm (int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr, uint32_t longitud);
+
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+
+uint32_t vector_prueba32_in[10]={1,1,1,1,1,1,1,1,1,1};
+uint32_t vector_prueba32_out[10]={1,1,1,1,1,1,1,1,1,1};
+uint16_t vector_prueba16_in[10]={1,1,1,1,1,1,1,1,1,1};
+uint16_t vector_prueba16_out[10]={1,1,1,1,1,1,1,1,1,1};
+
+int main(void){
+  init();
+  zeros_asm(vector_prueba32_in,10);
+  //productoEscalar32_c(vector_prueba32_in,vector_prueba32_out,10,3);
+  for (;;){
+
+  }
+
+}
+
+
+void zeros_c (uint32_t * vector, uint32_t longitud){
+	while(longitud--)*(vector++)=0;
+}
+void productoEscalar32_c (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar){
+	while(longitud--)*(vectorOut++)=(*vectorIn++)*escalar;
+
+}
+void productoEscalar16_c (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar){
+	while(longitud--)*(vectorOut++)=(*vectorIn++)*escalar;
+}
+void productoEscalar12_c (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar){
+	while(longitud--){
+		if(((*vectorIn)*escalar)>((1<<BITSAT)-1)){
+			*(vectorOut++)=((1<<BITSAT)-1);
+			vectorIn++;
+		}else *(vectorOut++)=*(vectorIn++);
+
+	}
+
+}
+void filtroVentana10_c(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitudVectorIn){}
+void pack32to16_c (int32_t * vectorIn, int16_t *vectorOut, uint32_t longitud){}
+
+int32_t max_c (int32_t * vectorIn, uint32_t longitud){
+	int32_t maximo=*vectorIn;
+	while(longitud--){
+		if(maximo<*(vectorIn))maximo=*vectorIn;
+		vectorIn++;
+	}
+	return maximo;
+}
+
+void downsampleM_c (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N){
+	*(vectorOut++)=*(vectorIn++);
+	while(--longitud){
+		if(!(longitud%N))vectorIn++;
+		else*(vectorOut++)=*(vectorIn++);
+	}
+
+
+
+}
+void invertir_c (uint16_t * vector, uint32_t longitud){
+	uint16_t aux;
+	while(longitud--){
+		aux=vector[longitud];
+		*(vector+longitud)=*vector;
+		*(vector++)=aux;
+	}
+}
+void corr_c (int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr, uint32_t longitud){
+
+	int16_t sxy;
+    uint32_t delay,i,j;
+    for(delay = -longitud + 1; delay < longitud; delay++){
+        sxy = 0;
+        for(i=0; i<longitud; i++){
+            j = i + delay;
+            if((j < 0) || (j >= longitud))continue;
+            else sxy += (vectorX[i] * vectorY[j]);
+        }
+        vectorCorr[delay + longitud - 1] = sxy;
+    }
+}
+
+
+void zeros_asm (uint32_t * vector, uint32_t longitud){
+
+	int a=0;
+	__asm volatile("		\t MOV R0, %0" :: "r"(longitud));
+	__asm volatile("		\t MOV R1, %0" :: "r"(a));
+	__asm volatile("		\t MOV R2, %0" :: "r"(vector));
+	__asm volatile("\n loop:\n");
+	__asm volatile("		\t STR R1, [R2],+4" : "=r"(vector));
+	__asm volatile("		\n\t SUB R0,R0,#1");
+	__asm volatile("		\n\t CMP R0,0");
+	__asm volatile("		\n\t BNE loop");
+
+
+}
+void productoEscalar32_asm (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar){}
+void productoEscalar16_asm (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar){}
+void productoEscalar12_asm (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar){}
+void filtroVentana10_asm(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitudVectorIn){}
+void pack32to16_asm (int32_t * vectorIn, int16_t *vectorOut, uint32_t longitud){}
+int32_t max_asm (int32_t * vectorIn, uint32_t longitud){
+	return 0;
+}
+void downsampleM_asm (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N){}
+void invertir_asm (uint16_t * vector, uint32_t longitud){}
+void corr_asm (int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr, uint32_t longitud){}
+
