@@ -152,7 +152,7 @@ void productoEscalar32_asm (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t 
 	__asm volatile("		\t MUL R6,R4,R1");
 	__asm volatile("		\t STR R6,[R3],+4");
 	__asm volatile("		\n\t SUB R0,#1");
-	__asm volatile("		\n\t CMP R0,#0");
+	__asm volatile("		\n\t CMP R0,0");
 	__asm volatile("		\n\t BNE loop2");
 
 
@@ -170,7 +170,7 @@ void productoEscalar16_asm (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t 
 	__asm volatile("		\t MUL R6,R4,R1");
 	__asm volatile("		\t STR R6,[R3],+4");
 	__asm volatile("		\n\t SUB R0,#1");
-	__asm volatile("		\n\t CMP R0,#0");
+	__asm volatile("		\n\t CMP R0,0");
 	__asm volatile("		\n\t BNE loop3");
 
 }
@@ -185,13 +185,12 @@ void productoEscalar12_asm (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t 
 	__asm volatile("\n loop4:\n");
 	__asm volatile("		\t LDR R4,[R2],+4");
 	__asm volatile("		\t MUL R6,R4,R1");
-	__asm volatile("		\t CMP R0,#(1<<12)");
+	__asm volatile("		\t CMP R6,0xfff");
 	__asm volatile("		\t BLO sigo");
-	__asm volatile("		\t MOV R6,#(1<<12)");
 	__asm volatile("\n sigo:\n");
 	__asm volatile("		\t STR R6,[R3],+4");
 	__asm volatile("		\n\t SUB R0,#1");
-	__asm volatile("		\n\t CMP R0,#0");
+	__asm volatile("		\n\t CMP R0,0");
 	__asm volatile("		\n\t BNE loop4");
 
 
