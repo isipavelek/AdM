@@ -25,6 +25,7 @@ int32_t max_c (int32_t * vectorIn, uint32_t longitud);
 void downsampleM_c (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N);
 void invertir_c (uint16_t * vector, uint32_t longitud);
 void corr_c (int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr, uint32_t longitud);
+void eco_c (int16_t *vectorX,int16_t *vectorY,uint32_t longitud);
 /*
  * Prototipos de Funciones en Assembly
   * */
@@ -39,6 +40,7 @@ int32_t max_asm (int32_t * vectorIn, uint32_t longitud);
 void downsampleM_asm (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N);
 void invertir_asm (uint16_t * vector, uint32_t longitud);
 void corr_asm (int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr, uint32_t longitud);
+void eco_asm (int16_t *vectorX,int16_t *vectorY,uint32_t longitud);
 
 
 /**
@@ -48,15 +50,16 @@ void corr_asm (int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr, uint32_t
 
 int32_t vector_prueba32_in[]={1,2,3,4,5,6,7,8,9,10};
 int32_t vector_prueba32_out[]={0,0,0,0,0,0,0,0,0,0};
-uint16_t vector_prueba16_in[]={1,2,3,4,5,6,7,8,9,10};;
-uint16_t vector_prueba16_out[]={1,1,1,1,1,1,1,1,1,1};
+int16_t vector_prueba16_in[]={1,2,3,4,5,6,7,8,9,10};;
+int16_t vector_prueba16_out[]={1,2,3,4,5,6,7,8,9,10};
+int16_t vector_prueba16_outx[]={1,2,3,4,5,6,7,8,9,10};
 
 int main(void){
   init();
   //productoEscalar32_asm(vector_prueba32_in,vector_prueba32_out,10,5);
   //productoEscalar32_c(vector_prueba32_in,vector_prueba32_out,10,3);
 
-  filtroVentana10_asm(vector_prueba16_in,vector_prueba16_out,10);
+  corr_c(vector_prueba16_in,vector_prueba16_out,vector_prueba16_outx,10);
 
   for (;;);
 
@@ -130,18 +133,32 @@ void invertir_c (uint16_t * vector, uint32_t longitud){
 		*(vector++)=aux;
 	}
 }
+#define RATE 44100 //muestras por mili segundo
+#define TIEMPO_ECO 0.02
+#define MUESTRA_ECO (RATE*TIEMPO_ECO)
+
+void eco_c (int16_t *vectorX,int16_t *vectorY,uint32_t longitud){
+	uint32_t i=0;
+	while(i<longitud){
+		*(vectorY++)=*(vectorX++);
+		if(i>=MUESTRA_ECO)*(vectorY++)+=(*(vectorX-i))/2;
+		i++;
+	}
+
+}
 void corr_c (int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr, uint32_t longitud){
 
+
 	int16_t sxy;
-    uint32_t delay,i,j;
-    for(delay = -longitud + 1; delay < longitud; delay++){
+    int32_t demora,i,j;
+    for(demora = -longitud + 1; demora < (int32_t)longitud; demora++){
         sxy = 0;
         for(i=0; i<longitud; i++){
-            j = i + delay;
+            j = i + demora;
             if((j < 0) || (j >= longitud))continue;
             else sxy += (vectorX[i] * vectorY[j]);
         }
-        vectorCorr[delay + longitud - 1] = sxy;
+        vectorCorr[demora + longitud - 1] = sxy;
     }
 }
 
@@ -331,16 +348,71 @@ void invertir_asm (uint16_t * vector, uint32_t longitud){
 }
 void corr_asm (int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr, uint32_t longitud){
 
-
-	/*__asm volatile("		MOV  R0, %0" :: "r"(longitud));
+	__asm volatile("		MOV  R0, %0" :: "r"(longitud));
 	__asm volatile("		MOV  R2, %0" :: "r"(vectorX));
 	__asm volatile("		MOV  R3, %0" :: "r"(vectorY));
 	__asm volatile("		MOV  R4, %0" :: "r"(vectorCorr));
+	__asm volatile("\n loop15:");
+	__asm volatile("		MVN  R5, R0");
+	__asm volatile("		ADD  R5, #2");
+	__asm volatile("		CMP  R5, R0");
+	__asm volatile("		BLT	 salirrr");
+	__asm volatile("		MVN  R6, #0");
+	__asm volatile("\n for2:");
+	__asm volatile("		MVN  R7, #0");
+	__asm volatile("		CMP  R7, R0");
+	__asm volatile("		BLT	 ciclo2");
+	__asm volatile("		ADD  R8, R7");
+	__asm volatile("		ADD  R8, R5");
+	__asm volatile("		CMP  R8, #0");
+	__asm volatile("		BLT  for2");
+	__asm volatile("		CMP  R8, R0");
+	__asm volatile("		BGE  for2");
+	__asm volatile("		LDRH R9, [R2,R7]");
+	__asm volatile("		LDRH R11,[R3,R8] ");
+	__asm volatile("		MUL  R9, R11");
+	__asm volatile("		ADD  R6, R9");
+	__asm volatile("		ADD  R7, #1");
+	__asm volatile("\n ciclo2:");
+	__asm volatile("		MOV  R10, R0");
+	__asm volatile("		SUB  R10, #1");
+	__asm volatile("		ADD  R10, R5");
+	__asm volatile("		STRH R6, [R4,R10]");
+	__asm volatile("		ADD  R5, #1");
+	__asm volatile("		B	loop15");
 
-	__asm volatile("\n loop10:");
-	__asm volatile("		SUB  R4,#1");
-	__asm volatile("		CMP  R4,#0");
-	__asm volatile("		BNE  loop10");*/
+	__asm volatile("\n salirrr:");
+
 
 }
 
+void eco_asm (int16_t *vectorX,int16_t *vectorY,uint32_t longitud){
+
+
+	__asm volatile("		MOV  R0, %0" :: "r"(longitud));
+	__asm volatile("		MOV  R2, %0" :: "r"(vectorX));
+	__asm volatile("		MOV  R3, %0" :: "r"(vectorY));
+	__asm volatile("		MOV  R4, #0");
+	__asm volatile("\n loop14:");
+
+	__asm volatile("		CMP  R4, R0");
+	__asm volatile("		BEQ  salir14");
+	__asm volatile("		LDRH R5, [R2]");
+	__asm volatile("		MOV  R8, #882");
+	__asm volatile("		CMP  R4, R8");
+	__asm volatile("		BLO  salto14");
+	__asm volatile("		MOV  R7, R2");
+	__asm volatile("		SUB  R7, #882");
+	__asm volatile("		LDRH R6, [R7]");
+	__asm volatile("		MOV  R6, R6, LSR #2");
+	__asm volatile("		ADD  R5, R6");
+	__asm volatile("\n salto14:");
+	__asm volatile("		STRH R5, [R3],#2");
+	__asm volatile("		ADD  R2, #2");
+	__asm volatile("		B	loop14");
+	__asm volatile("\n salir14:");
+
+
+
+
+}
