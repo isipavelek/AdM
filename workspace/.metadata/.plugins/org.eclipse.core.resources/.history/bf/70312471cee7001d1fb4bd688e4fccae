@@ -87,7 +87,7 @@ void productoEscalar12_c (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t lo
 
 void filtroVentana10_c(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitudVectorIn){
 	uint32_t suma=0;
-	while((longitudVectorIn--)>=VENTANA){
+	while(longitudVectorIn--){
 		suma=0;
 		for(uint32_t i=0;i<VENTANA;i++)suma+=*(vectorIn+i);
 		*(vectorOut++)=suma/VENTANA;
@@ -218,7 +218,7 @@ void productoEscalar12_asm (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t 
 void filtroVentana10_asm(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitudVectorIn){
 
 	/*uint32_t suma=0;
-	while((longitudVectorIn--)>=VENTANA){
+	while(longitudVectorIn--){
 		suma=0;
 		for(uint32_t i=0;i<VENTANA;i++)suma+=*(vectorIn+i);
 		*(vectorOut++)=suma/VENTANA;
@@ -230,8 +230,8 @@ void filtroVentana10_asm(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t lon
 	__asm volatile("		MOV  R3, %0" :: "r"(vectorOut));
 	__asm volatile("\n volver:");
 	__asm volatile("		MOV  R4, #0");
-	__asm volatile("		MOV  R5, #0");
 	__asm volatile("\n loop11:");
+	__asm volatile("		MOV  R5, #0");
 	__asm volatile("		CMP  R5, #6");
 	__asm volatile("		BEQ  salgo3");
 	__asm volatile("		LDRH  R6,[R2,R5]");
@@ -240,12 +240,12 @@ void filtroVentana10_asm(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t lon
 	__asm volatile("		B	 loop11"	);
 	__asm volatile("\n salgo3:");
 	__asm volatile("		MOV  R7,#3	 ");
-	__asm volatile("		UDIV R4,R4,R7	 ");
+	__asm volatile("		UDIV R4,R4,#3 	 ");
 	__asm volatile("		STRH R4,[R3],#2");
 	__asm volatile("		ADD  R2,#2"	);
 	__asm volatile("		SUB  R0,#1");
-	__asm volatile("		CMP  R0,#3");
-	__asm volatile("		BGE  volver");
+	__asm volatile("		CMP  R0,#0");
+	__asm volatile("		BNE  volver");
 
 }
 void pack32to16_asm (int32_t * vectorIn, int16_t *vectorOut, uint32_t longitud){
