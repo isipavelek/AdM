@@ -14,8 +14,8 @@
 ../Core/Src/main.c:180:6:productoEscalar16_asm	24	static,ignoring_inline_asm
 ../Core/Src/main.c:197:6:productoEscalar12_asm	24	static,ignoring_inline_asm
 ../Core/Src/main.c:218:6:filtroVentana10_asm	24	static,ignoring_inline_asm
-../Core/Src/main.c:251:6:pack32to16_asm	24	static,ignoring_inline_asm
-../Core/Src/main.c:266:9:max_asm	24	static,ignoring_inline_asm
-../Core/Src/main.c:289:6:downsampleM_asm	24	static,ignoring_inline_asm
-../Core/Src/main.c:321:6:invertir_asm	16	static,ignoring_inline_asm
-../Core/Src/main.c:341:6:corr_asm	24	static,ignoring_inline_asm
+../Core/Src/main.c:243:6:pack32to16_asm	24	static,ignoring_inline_asm
+../Core/Src/main.c:258:9:max_asm	24	static,ignoring_inline_asm
+../Core/Src/main.c:281:6:downsampleM_asm	24	static,ignoring_inline_asm
+../Core/Src/main.c:312:6:invertir_asm	16	static,ignoring_inline_asm
+../Core/Src/main.c:332:6:corr_asm	24	static

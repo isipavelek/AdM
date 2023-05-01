@@ -217,6 +217,14 @@ void productoEscalar12_asm (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t 
 }
 void filtroVentana10_asm(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitudVectorIn){
 
+	/*uint32_t suma=0;
+	while((longitudVectorIn--)>=VENTANA){
+		suma=0;
+		for(uint32_t i=0;i<VENTANA;i++)suma+=*(vectorIn+i);
+		*(vectorOut++)=suma/VENTANA;
+		vectorIn++;
+	}*/
+
 	__asm volatile("		MOV  R0, %0" :: "r"(longitudVectorIn));
 	__asm volatile("		MOV  R2, %0" :: "r"(vectorIn));
 	__asm volatile("		MOV  R3, %0" :: "r"(vectorOut));
@@ -306,6 +314,7 @@ void downsampleM_asm (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud
 	__asm volatile("\n salir:");
 
 
+
 }
 
 
@@ -331,8 +340,7 @@ void invertir_asm (uint16_t * vector, uint32_t longitud){
 }
 void corr_asm (int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr, uint32_t longitud){
 
-
-	/*__asm volatile("		MOV  R0, %0" :: "r"(longitud));
+	__asm volatile("		MOV  R0, %0" :: "r"(longitud));
 	__asm volatile("		MOV  R2, %0" :: "r"(vectorX));
 	__asm volatile("		MOV  R3, %0" :: "r"(vectorY));
 	__asm volatile("		MOV  R4, %0" :: "r"(vectorCorr));
@@ -340,7 +348,7 @@ void corr_asm (int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr, uint32_t
 	__asm volatile("\n loop10:");
 	__asm volatile("		SUB  R4,#1");
 	__asm volatile("		CMP  R4,#0");
-	__asm volatile("		BNE  loop10");*/
+	__asm volatile("		BNE  loop10");
 
 }
 
