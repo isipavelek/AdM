@@ -88,7 +88,8 @@ void filtroVentana10_c(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longi
 void pack32to16_c (int32_t * vectorIn, int16_t *vectorOut, uint32_t longitud){
 
 	while(longitud--){
-		if(*vectorIn<(1<<16))*(vectorOut++)=(int16_t )(*(vectorIn++));
+
+		if(*vectorIn<(1<<16))*(vectorOut++)=(int16_t *)*(vectorIn++);
 		else *(vectorOut++)=((1<<16)-1);
 	}
 
@@ -207,29 +208,29 @@ void productoEscalar12_asm (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t 
 }
 void filtroVentana10_asm(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitudVectorIn){
 
-	__asm volatile("		MOV R0, %0" :: "r"(longitudVectorIn));
-	__asm volatile("		MOV R2, %0" :: "r"(vectorIn));
-	__asm volatile("		MOV R3, %0" :: "r"(vectorOut));
+		__asm volatile("		MOV R0, %0" :: "r"(longitudVectorIn));
+		__asm volatile("		MOV R2, %0" :: "r"(vectorIn));
+		__asm volatile("		MOV R3, %0" :: "r"(vectorOut));
 
 
-	__asm volatile("\n loop11:");
-	__asm volatile("		SUB R4,#1");
-	__asm volatile("		CMP R4,#0");
-	__asm volatile("		BNE loop11");
+		__asm volatile("\n loop11:");
+		__asm volatile("		SUB R4,#1");
+		__asm volatile("		CMP R4,#0");
+		__asm volatile("		BNE loop11");
 
 }
 void pack32to16_asm (int32_t * vectorIn, int16_t *vectorOut, uint32_t longitud){
 
-	__asm volatile("		MOV R0, %0" :: "r"(longitud));
-	__asm volatile("		MOV R2, %0" :: "r"(vectorIn));
-	__asm volatile("		MOV R3, %0" :: "r"(vectorOut));
-	__asm volatile("\n loop12:");
-	__asm volatile("		LDR  R4,[R2],+4");
-	__asm volatile("		USAT R4,#16,R4");
-	__asm volatile("		STRH R4,[R3],+4");
-	__asm volatile("		SUB R4,#1");
-	__asm volatile("		CMP R4,#0");
-	__asm volatile("		BNE loop12");
+		__asm volatile("		MOV R0, %0" :: "r"(longitud));
+		__asm volatile("		MOV R2, %0" :: "r"(vectorIn));
+		__asm volatile("		MOV R3, %0" :: "r"(vectorOut));
+		__asm volatile("\n loop12:");
+		__asm volatile("		LDR  R4,[R2],+4");
+		__asm volatile("		USAT R4,#16,R4");
+		__asm volatile("		STRH R4,[R3],+4");
+		__asm volatile("		SUB R4,#1");
+		__asm volatile("		CMP R4,#0");
+		__asm volatile("		BNE loop12");
 
 }
 
@@ -258,30 +259,30 @@ int32_t max_asm (int32_t * vectorIn, uint32_t longitud){
 }
 void downsampleM_asm (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N){
 
-	__asm volatile("		MOV R0, %0" :: "r"(longitud));
-	__asm volatile("		ADD R0,#1");
-	__asm volatile("		MOV R1, %0" :: "r"(N));
-	__asm volatile("		MOV R2, %0" :: "r"(vectorIn));
-	__asm volatile("		MOV R3, %0" :: "r"(vectorOut));
-	__asm volatile("		MOV R4, #1");
-	__asm volatile("		CMP R0,R4");
-	__asm volatile("		BEq salir");
-	__asm volatile("\n loop8:");
+		__asm volatile("		MOV R0, %0" :: "r"(longitud));
+		__asm volatile("		ADD R0,#1");
+		__asm volatile("		MOV R1, %0" :: "r"(N));
+		__asm volatile("		MOV R2, %0" :: "r"(vectorIn));
+		__asm volatile("		MOV R3, %0" :: "r"(vectorOut));
+		__asm volatile("		MOV R4, #1");
+		__asm volatile("		CMP R0,R4");
+		__asm volatile("		BEq salir");
+		__asm volatile("\n loop8:");
 
-	__asm volatile("		MOV R6,R4");
-	__asm volatile("\n restando:");
-	__asm volatile("		SUB R6,R1");
-	__asm volatile("		CMP R6,#0");
-	__asm volatile("		BGT restando");
-	__asm volatile("		BEQ restocero");
-	__asm volatile("		LDR R5,[R2]");
-	__asm volatile("		STR R5,[R3],#+4");
-	__asm volatile("\n restocero:");
-	__asm volatile("		ADD R2,#+4");
-	__asm volatile("		ADD R4,#1");
-	__asm volatile("		CMP R4,R0");
-	__asm volatile("		BNE loop8");
-	__asm volatile("\n salir:");
+		__asm volatile("		MOV R6,R4");
+		__asm volatile("\n restando:");
+		__asm volatile("		SUB R6,R1");
+		__asm volatile("		CMP R6,#0");
+		__asm volatile("		BGT restando");
+		__asm volatile("		BEQ restocero");
+		__asm volatile("		LDR R5,[R2]");
+		__asm volatile("		STR R5,[R3],#+4");
+		__asm volatile("\n restocero:");
+		__asm volatile("		ADD R2,#+4");
+		__asm volatile("		ADD R4,#1");
+		__asm volatile("		CMP R4,R0");
+		__asm volatile("		BNE loop8");
+		__asm volatile("\n salir:");
 
 
 
@@ -310,15 +311,15 @@ void invertir_asm (uint16_t * vector, uint32_t longitud){
 }
 void corr_asm (int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr, uint32_t longitud){
 
-	__asm volatile("		MOV R0, %0" :: "r"(longitud));
-	__asm volatile("		MOV R2, %0" :: "r"(vectorX));
-	__asm volatile("		MOV R3, %0" :: "r"(vectorY));
-	__asm volatile("		MOV R4, %0" :: "r"(vectorCorr));
+		__asm volatile("		MOV R0, %0" :: "r"(longitud));
+		__asm volatile("		MOV R2, %0" :: "r"(vectorX));
+		__asm volatile("		MOV R3, %0" :: "r"(vectorY));
+		__asm volatile("		MOV R4, %0" :: "r"(vectorCorr));
 
-	__asm volatile("\n loop10:");
-	__asm volatile("		SUB R4,#1");
-	__asm volatile("		CMP R4,#0");
-	__asm volatile("		BNE loop10");
+		__asm volatile("\n loop10:");
+		__asm volatile("		SUB R4,#1");
+		__asm volatile("		CMP R4,#0");
+		__asm volatile("		BNE loop10");
 
 }
 

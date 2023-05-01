@@ -29,23 +29,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  12 .ARM.attributes 00000030  00000000  00000000  00020034  2**0
                   CONTENTS, READONLY
- 13 .debug_info   0000f06a  00000000  00000000  00020064  2**0
+ 13 .debug_info   0000f06f  00000000  00000000  00020064  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_abbrev 00001c60  00000000  00000000  0002f0ce  2**0
+ 14 .debug_abbrev 00001c71  00000000  00000000  0002f0d3  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_aranges 00000bd0  00000000  00000000  00030d30  2**3
+ 15 .debug_aranges 00000bd0  00000000  00000000  00030d48  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_ranges 00000b28  00000000  00000000  00031900  2**3
+ 16 .debug_ranges 00000b28  00000000  00000000  00031918  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_macro  00023f97  00000000  00000000  00032428  2**0
+ 17 .debug_macro  00023f97  00000000  00000000  00032440  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line   0000ce47  00000000  00000000  000563bf  2**0
+ 18 .debug_line   0000ce9e  00000000  00000000  000563d7  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    000d9536  00000000  00000000  00063206  2**0
+ 19 .debug_str    000d9536  00000000  00000000  00063275  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .comment      00000050  00000000  00000000  0013c73c  2**0
+ 20 .comment      00000050  00000000  00000000  0013c7ab  2**0
                   CONTENTS, READONLY
- 21 .debug_frame  00003210  00000000  00000000  0013c78c  2**2
+ 21 .debug_frame  00003210  00000000  00000000  0013c7fc  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -963,7 +963,7 @@ int main(void){
  80008a6:	4803      	ldr	r0, [pc, #12]	; (80008b4 <main+0x1c>)
  80008a8:	f000 f806 	bl	80008b8 <downsampleM_asm>
 
-  for (;;){
+  for (;;);
  80008ac:	e7fe      	b.n	80008ac <main+0x14>
  80008ae:	bf00      	nop
  80008b0:	200007d0 	.word	0x200007d0
@@ -984,61 +984,61 @@ void downsampleM_asm (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud
  80008c2:	607a      	str	r2, [r7, #4]
  80008c4:	603b      	str	r3, [r7, #0]
 
-		__asm volatile("		MOV R0, %0" :: "r"(longitud));
+	__asm volatile("		MOV R0, %0" :: "r"(longitud));
  80008c6:	687b      	ldr	r3, [r7, #4]
  80008c8:	4618      	mov	r0, r3
-		__asm volatile("		ADD R0,#1");
+	__asm volatile("		ADD R0,#1");
  80008ca:	f100 0001 	add.w	r0, r0, #1
-		__asm volatile("		MOV R1, %0" :: "r"(N));
+	__asm volatile("		MOV R1, %0" :: "r"(N));
  80008ce:	683b      	ldr	r3, [r7, #0]
  80008d0:	4619      	mov	r1, r3
-		__asm volatile("		MOV R2, %0" :: "r"(vectorIn));
+	__asm volatile("		MOV R2, %0" :: "r"(vectorIn));
  80008d2:	68fb      	ldr	r3, [r7, #12]
  80008d4:	461a      	mov	r2, r3
-		__asm volatile("		MOV R3, %0" :: "r"(vectorOut));
+	__asm volatile("		MOV R3, %0" :: "r"(vectorOut));
  80008d6:	68bb      	ldr	r3, [r7, #8]
  80008d8:	461b      	mov	r3, r3
-		__asm volatile("		MOV R4, #1");
+	__asm volatile("		MOV R4, #1");
  80008da:	f04f 0401 	mov.w	r4, #1
-		__asm volatile("		CMP R0,R4");
+	__asm volatile("		CMP R0,R4");
  80008de:	42a0      	cmp	r0, r4
-		__asm volatile("		BEq salir");
+	__asm volatile("		BEq salir");
  80008e0:	d00e      	beq.n	8000900 <salir>
 
 080008e2 <loop8>:
-		__asm volatile("\n loop8:");
+	__asm volatile("\n loop8:");
 
-		__asm volatile("		MOV R6,R4");
+	__asm volatile("		MOV R6,R4");
  80008e2:	4626      	mov	r6, r4
 
 080008e4 <restando>:
-		__asm volatile("\n restando:");
-		__asm volatile("		SUB R6,R1");
+	__asm volatile("\n restando:");
+	__asm volatile("		SUB R6,R1");
  80008e4:	eba6 0601 	sub.w	r6, r6, r1
-		__asm volatile("		CMP R6,#0");
+	__asm volatile("		CMP R6,#0");
  80008e8:	2e00      	cmp	r6, #0
-		__asm volatile("		BGT restando");
+	__asm volatile("		BGT restando");
  80008ea:	dcfb      	bgt.n	80008e4 <restando>
-		__asm volatile("		BEQ restocero");
+	__asm volatile("		BEQ restocero");
  80008ec:	d002      	beq.n	80008f4 <restocero>
-		__asm volatile("		LDR R5,[R2]");
+	__asm volatile("		LDR R5,[R2]");
  80008ee:	6815      	ldr	r5, [r2, #0]
-		__asm volatile("		STR R5,[R3],#+4");
+	__asm volatile("		STR R5,[R3],#+4");
  80008f0:	f843 5b04 	str.w	r5, [r3], #4
 
 080008f4 <restocero>:
-		__asm volatile("\n restocero:");
-		__asm volatile("		ADD R2,#+4");
+	__asm volatile("\n restocero:");
+	__asm volatile("		ADD R2,#+4");
  80008f4:	f102 0204 	add.w	r2, r2, #4
-		__asm volatile("		ADD R4,#1");
+	__asm volatile("		ADD R4,#1");
  80008f8:	f104 0401 	add.w	r4, r4, #1
-		__asm volatile("		CMP R4,R0");
+	__asm volatile("		CMP R4,R0");
  80008fc:	4284      	cmp	r4, r0
-		__asm volatile("		BNE loop8");
+	__asm volatile("		BNE loop8");
  80008fe:	d1f0      	bne.n	80008e2 <loop8>
 
 08000900 <salir>:
-		__asm volatile("\n salir:");
+	__asm volatile("\n salir:");
 
 
 
