@@ -1,32 +1,11 @@
 #include "init.h"
 #include "asm_func.h"
 
+static void PrivilegiosSVC (void);
 
-/******************************************
-Definiciones General para probar
-*******************************************/
-
+#define BITSAT 12
 #define ESCALAR 3
 #define M 2
-
-/******************************************
-Definiciones saturación
-*******************************************/
-#define BITSAT 12
-
-/******************************************
-Definicines Rutina filtro de Ventana
-*******************************************/
-
-#define VENTANA 11
-/******************************************
-Definiciones Rutina de ECO
-*******************************************/
-#define RATE 44100 //muestras por mili segundo
-#define TIEMPO_ECO 0.02
-#define MUESTRA_ECO (uint32_t)(RATE*TIEMPO_ECO) //puedo probarlo con 2
-
-
 
 void zeros_c (uint32_t * vector, uint32_t longitud);
 void productoEscalar32_c (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar);
@@ -39,11 +18,6 @@ void downsampleM_c (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, 
 void invertir_c (uint16_t * vector, uint32_t longitud);
 void corr_c (int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr, uint32_t longitud);
 void eco_c (int16_t *vectorX,int16_t *vectorY,uint32_t longitud);
-static void PrivilegiosSVC (void);
-
-/******************************************
-Vectores armados para poder ir probando las funciones en C y Asm
-*******************************************/
 
 //32 bits sin signo
 uint32_t vectorIn_uint32_t[]={1,2,3,4,5,6,7,8,9,10};
@@ -112,66 +86,16 @@ int main(void){
     for(;;);
 }
 
-/**
-  * @brief  zeros_c
-  * @param  uint32_t vector
-  * @param  uint32_t longitud
-  * @return void
-  * @author Ing. Pavelek Israel
-  * @version 1.0
-  * @date 13/05/2023
-*/
-
-
 void zeros_c (uint32_t * vector, uint32_t longitud){
 	while(longitud--)*(vector++)=0;
 }
-
-/**
-  * @brief  productoEscalar32_c
-  * @param  uint32_t * vectorIn
-  * @param  uint32_t * vectorOut
-  * @param  uint32_t longitud
-  * @param  uint32_t escalar
-  * @return void
-  * @author Ing. Pavelek Israel
-  * @version 1.0
-  * @date 13/05/2023
-*/
-
 void productoEscalar32_c (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar){
 	while(longitud--)*(vectorOut++)=(*vectorIn++)*escalar;
 
 }
-
-/**
-  * @brief  productoEscalar16_c
-  * @param  uint16_t * vectorIn
-  * @param  uint16_t * vectorOut
-  * @param  uint32_t longitud
-  * @param  uint16_t escalar
-  * @return void
-  * @author Ing. Pavelek Israel
-  * @version 1.0
-  * @date 13/05/2023
-*/
-
-
 void productoEscalar16_c (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar){
 	while(longitud--)*(vectorOut++)=(*vectorIn++)*escalar;
 }
-
-/**
-  * @brief  productoEscalar12_c
-  * @param  uint16_t * vectorIn
-  * @param  uint16_t * vectorOut
-  * @param  uint32_t longitud
-  * @param  uint16_t escalar
-  * @return void
-  * @author Ing. Pavelek Israel
-  * @version 1.0
-  * @date 13/05/2023
-*/
 void productoEscalar12_c (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar){
 	while(longitud--){
 		if(((*vectorIn)*escalar)>((1<<BITSAT)-1)){
@@ -182,18 +106,7 @@ void productoEscalar12_c (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t lo
 	}
 
 }
-
-
-/**
-  * @brief  filtroVentana10_c
-  * @param  uint16_t * vectorIn
-  * @param uint16_t * vectorOut
-  * @param  uint32_t longitudVectorIn
-  * @return void
-  * @author Ing. Pavelek Israel
-  * @version 1.0
-  * @date 13/05/2023
-*/
+#define VENTANA 11
 
 void filtroVentana10_c(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitudVectorIn){
 
@@ -206,18 +119,8 @@ void filtroVentana10_c(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longi
 		}
 		vectorOut[i]=suma/VENTANA;
 	}
-}
 
-/**
-  * @brief  pack32to16_c
-  * @param  int32_t * vectorIn
-  * @param  int16_t *vectorOut
-  * @param  uint32_t longitud
-  * @return void
-  * @author Ing. Pavelek Israel
-  * @version 1.0
-  * @date 13/05/2023
-*/
+}
 void pack32to16_c (int32_t * vectorIn, int16_t *vectorOut, uint32_t longitud){
 
 	while(longitud--){
@@ -226,16 +129,6 @@ void pack32to16_c (int32_t * vectorIn, int16_t *vectorOut, uint32_t longitud){
 	}
 
 }
-
-/**
-  * @brief  max_c
-  * @param  int32_t * vectorIn
-  * @param  uint32_t longitud
-  * @return void
-  * @author Ing. Pavelek Israel
-  * @version 1.0
-  * @date 13/05/2023
-*/
 
 int32_t max_c (int32_t * vectorIn, uint32_t longitud){
 	int32_t maximo=*vectorIn;
@@ -246,18 +139,6 @@ int32_t max_c (int32_t * vectorIn, uint32_t longitud){
 	return maximo;
 }
 
-/**
-  * @brief  downsampleM_c
-  * @param  int32_t * vectorIn
-  * @param  int32_t * vectorOut
-  * @param  uint32_t longitud
-  * @param  uint32_t N
-  * @return void
-  * @author Ing. Pavelek Israel
-  * @version 1.0
-  * @date 13/05/2023
-*/
-
 void downsampleM_c (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N){
 	*(vectorOut++)=*(vectorIn++);
 	uint32_t i=1;
@@ -267,17 +148,6 @@ void downsampleM_c (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, 
 	}
 
 }
-
-/**
-  * @brief  invertir_c
-  * @param  uint16_t * vector
-  * @param  uint32_t longitud
-  * @return void
-  * @author Ing. Pavelek Israel
-  * @version 1.0
-  * @date 13/05/2023
-*/
-
 void invertir_c (uint16_t * vector, uint32_t longitud){
 	uint16_t aux;
 	while(longitud--){
@@ -286,17 +156,9 @@ void invertir_c (uint16_t * vector, uint32_t longitud){
 		*(vector++)=aux;
 	}
 }
-
-/**
-  * @brief  invertir_c
-  * @param  int16_t *vectorX
-  * @param  int16_t *vectorY
-  * @param  uint32_t longitud
-  * @return void
-  * @author Ing. Pavelek Israel
-  * @version 1.0
-  * @date 13/05/2023
-*/
+#define RATE 44100 //muestras por mili segundo
+#define TIEMPO_ECO 0.02
+#define MUESTRA_ECO (uint32_t)(RATE*TIEMPO_ECO) //puedo probarlo con 2
 
 void eco_c (int16_t *vectorX,int16_t *vectorY,uint32_t longitud){
 	for(uint32_t i=0;i<longitud;i++){
@@ -306,18 +168,6 @@ void eco_c (int16_t *vectorX,int16_t *vectorY,uint32_t longitud){
 
 }
 
-
-/**
-  * @brief  corr_c
-  * @param  int16_t *vectorX
-  * @param  int16_t *vectorY
-  * @param  int16_t *vectorCorr
-  * @param  uint32_t longitud
-  * @return void
-  * @author Ing. Pavelek Israel
-  * @version 1.0
-  * @date 13/05/2023
-*/
 
 void corr_c (int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr, uint32_t longitud){
 

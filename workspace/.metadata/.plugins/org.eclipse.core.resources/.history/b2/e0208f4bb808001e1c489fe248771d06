@@ -18,9 +18,6 @@
 .global corrSIMD_asm
 .global ecoSIMD_asm
 
-.equ RATE_ASM, 44100 //muestras por mili segundo
-.equ TIEMPO_ASM, 50
-.equ MUESTRA_EQU_ASM, 1//882
 
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -394,6 +391,9 @@ corrSIMD_salir:
 @	r2: longitud
 @
 
+.equ RATE_ASM, 44100 //muestras por mili segundo
+.equ TIEMPO_ASM, 50
+.equ MUESTRA_EQU_ASM, 1//882
 
 
 .thumb_func

@@ -42,7 +42,7 @@ void eco_c (int16_t *vectorX,int16_t *vectorY,uint32_t longitud);
 static void PrivilegiosSVC (void);
 
 /******************************************
-Vectores armados para poder ir probando las funciones en C y Asm
+Vectores armados para poder ir probando las funciones
 *******************************************/
 
 //32 bits sin signo

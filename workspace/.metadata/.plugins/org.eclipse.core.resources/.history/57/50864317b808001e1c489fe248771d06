@@ -1,32 +1,13 @@
 #include "init.h"
 #include "asm_func.h"
 
+static void PrivilegiosSVC (void);
 
-/******************************************
-Definiciones General para probar
-*******************************************/
-
+#define BITSAT 12
 #define ESCALAR 3
 #define M 2
 
-/******************************************
-Definiciones saturación
-*******************************************/
-#define BITSAT 12
-
-/******************************************
-Definicines Rutina filtro de Ventana
-*******************************************/
-
 #define VENTANA 11
-/******************************************
-Definiciones Rutina de ECO
-*******************************************/
-#define RATE 44100 //muestras por mili segundo
-#define TIEMPO_ECO 0.02
-#define MUESTRA_ECO (uint32_t)(RATE*TIEMPO_ECO) //puedo probarlo con 2
-
-
 
 void zeros_c (uint32_t * vector, uint32_t longitud);
 void productoEscalar32_c (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar);
@@ -39,11 +20,6 @@ void downsampleM_c (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, 
 void invertir_c (uint16_t * vector, uint32_t longitud);
 void corr_c (int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr, uint32_t longitud);
 void eco_c (int16_t *vectorX,int16_t *vectorY,uint32_t longitud);
-static void PrivilegiosSVC (void);
-
-/******************************************
-Vectores armados para poder ir probando las funciones en C y Asm
-*******************************************/
 
 //32 bits sin signo
 uint32_t vectorIn_uint32_t[]={1,2,3,4,5,6,7,8,9,10};
@@ -143,6 +119,21 @@ void productoEscalar32_c (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t lo
 	while(longitud--)*(vectorOut++)=(*vectorIn++)*escalar;
 
 }
+
+
+/**
+  * @brief  productoEscalar32_c
+  * @param  uint16_t * vectorIn
+  * @param  uint16_t * vectorOut
+  * @param  uint32_t longitud
+  * @param  uint16_t escalar
+  * @return void
+  * @author Ing. Pavelek Israel
+  * @version 1.0
+  * @date 13/05/2023
+*/
+
+
 
 /**
   * @brief  productoEscalar16_c
@@ -286,6 +277,10 @@ void invertir_c (uint16_t * vector, uint32_t longitud){
 		*(vector++)=aux;
 	}
 }
+#define RATE 44100 //muestras por mili segundo
+#define TIEMPO_ECO 0.02
+#define MUESTRA_ECO (uint32_t)(RATE*TIEMPO_ECO) //puedo probarlo con 2
+
 
 /**
   * @brief  invertir_c
