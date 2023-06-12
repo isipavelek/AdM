@@ -60,8 +60,8 @@ all: main-build
 main-build: AdM.elf secondary-outputs
 
 # Tool invocations
-AdM.elf AdM.map: $(OBJS) $(USER_OBJS) C:\Users\ipave\Documents\GitHub\AdM\workspace\AdM\STM32F429ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "AdM.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\ipave\Documents\GitHub\AdM\workspace\AdM\STM32F429ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="AdM.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+AdM.elf AdM.map: $(OBJS) $(USER_OBJS) C:\Users\ipave\Documentos\GitHub\AdMV2\AdM\STM32F429ZITX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "AdM.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\ipave\Documentos\GitHub\AdMV2\AdM\STM32F429ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="AdM.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

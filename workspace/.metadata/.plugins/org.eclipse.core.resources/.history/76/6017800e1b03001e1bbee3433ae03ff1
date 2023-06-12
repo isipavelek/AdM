@@ -1,0 +1,360 @@
+.syntax unified
+.thumb
+.text
+
+@ Simbolos exportados
+.global asm_svc
+.global zeros_asm
+.global productoEscalar32_asm
+.global productoEscalar16_asm
+.global productoEscalar12_asm
+.global filtroVentana10_asm
+.global pack32to16_asm
+.global max_asm
+.global downsampleM_asm
+.global invertir_asm
+.global corr_asm
+.global eco_asm
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void asm_svc (void)
+@
+.thumb_func
+    asm_svc:
+        svc 0
+        bx lr
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void zeros_asm (uint32_t * vector, uint32_t longitud);
+@
+@ Parametros recibidos:
+@   r0: *vector
+@   r1: longitud
+@
+
+.thumb_func
+    zeros_asm:
+		MOV  R2, #0
+	loop:
+		SUBS R1,#1
+		STR  R2,[R0,R1,LSL #2]
+		BNE  loop
+		BX 	 lr
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void productoEscalar32_asm (uint32_t * vectorIn, uint32_t * vectorOut, uint32_t longitud, uint32_t escalar);
+@
+@ Parametros recibidos:
+@   r0: *vectorIn
+@   r1: *vectorOut
+@	r2: longitud
+@ 	r3: escalar
+@
+
+.thumb_func
+ 	productoEscalar32_asm:
+		PUSH {R4}
+	loop2:
+		SUBS R2,#1
+		LDR  R4,[R0,R2,LSL #2]
+		MUL  R4,R4,R3
+		STR  R4,[R1,R2,LSL #2]
+		BNE  loop2
+		POP	 {R4}
+		BX 	 lr
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void productoEscalar16_asm (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar);
+@
+@ Parametros recibidos:
+@   r0: *vectorIn
+@   r1: *vectorOut
+@	r2: longitud
+@   r3: escalar
+@
+
+.thumb_func
+	productoEscalar16_asm:
+		PUSH {R4}
+	loop3:
+		SUBS R2,#1
+		LDRH R4,[R0,R2,LSL #1]
+		MUL  R4,R4,R3
+		STRH R4,[R1,R2,LSL #1]
+		BNE  loop3
+		POP	 {R4}
+		BX 	 lr
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void productoEscalar12_asm (uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitud, uint16_t escalar);
+@
+@ Parametros recibidos:
+@   r0: *vectorIn
+@   r1: *vectorOut
+@	r2: longitud
+@   r3: escalar
+@
+.thumb_func
+	productoEscalar12_asm:
+		PUSH {R4}
+	loop4:
+		SUBS R2,#1
+		LDRH R4,[R0,R2,LSL #1]
+		MUL  R4,R4,R3
+		USAT R4,#12,R4
+		STRH R4,[R1,R2,LSL #1]
+		BNE  loop4
+		POP	 {R4}
+		BX 	 lr
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void filtroVentana10_asm(uint16_t * vectorIn, uint16_t * vectorOut, uint32_t longitudVectorIn);
+@
+@ Parametros recibidos:
+@   r0: *vectorIn
+@   r1: *vectorOut
+@	r2: longitudVectorIn
+@
+.equ VENTANA, 11
+.equ QUARTIL, VENTANA/2
+
+.thumb_func
+	filtroVentana10_asm:
+		PUSH {R4-R7}
+	volver:
+		MOV  R4, #0
+		MOV  R5, #0
+	loop11:
+		CMP  R5, R2
+		BEQ  salgo3
+		LDRH  R6,[R0,R5,LSL #1]
+		ADD  R4,R6
+		ADD  R5,#1
+		B	 loop11
+	salgo3:
+		MOV  R7,#3
+		UDIV R4,R4,R7
+		STRH R4,[R2]
+		ADD  R0,#2
+		SUB  R2,#1
+		CMP  R2,#3
+		BGE  volver
+		POP {R4-R7}
+		BX 	 lr
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void pack32to16_asm (int32_t * vectorIn, int16_t *vectorOut, uint32_t longitud);
+@
+@ Parametros recibidos:
+@   r0: *vectorIn
+@   r1: *vectorOut
+@	r2: longitud
+@
+
+.thumb_func
+	pack32to16_asm:
+		PUSH {R4}
+	loop12:
+		SUBS R2,#1
+		LDR  R4,[R0,R2,LSL #2]
+		USAT R4,#16,R4
+		STRH R4,[R1,R2,LSL #1]
+		BNE  loop12
+		POP	 {R4}
+		BX 	 lr
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   int32_t max_asm (int32_t * vectorIn, uint32_t longitud);
+@
+@ Parametros recibidos:
+@   r0: *vectorIn
+@   r1: longitud
+@ Valor de retorno:
+@   r0: valor maximo en vectorIn
+@
+.thumb_func
+	max_asm:
+		SUBS  R1,#1
+		LDR  R2,[R0,R1,LSL #2]
+		BEQ  salgo
+	loop5:
+		LDR  R3,[R0,R1,LSL #2]
+		CMP  R3,R2
+		BLT  sigo2
+		MOV  R2,R3
+	sigo2:
+		SUBS R1,#1
+		BNE  loop5
+	salgo:
+		MOV  R0,R2
+		BX 	 lr
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void downsampleM_asm (int32_t * vectorIn, int32_t * vectorOut, uint32_t longitud, uint32_t N);
+@
+@ Parametros recibidos:
+@   r0: *vectorIn
+@   r1: *vectorOut
+@	r2: longitud
+@   r3: N
+@
+.thumb_func
+ 	downsampleM_asm:
+
+		PUSH {R4-R6}
+		ADD  R2,#1
+		MOV  R4, #1
+		CMP  R2,R4
+		BEQ  salir
+	loop8:
+
+		MOV  R6,R4
+	restando:
+		SUBS R6,R3
+		BGT  restando
+		BEQ  restocero
+		LDR  R5,[R0]
+		STR  R5,[R1],#+4
+	restocero:
+		ADD  R0,#+4
+		ADD  R4,#1
+		CMP  R4,R2
+		BNE  loop8
+	salir:
+		POP {R4-R6}
+ 		BX 	 lr
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void invertir_asm (uint16_t * vector, uint32_t longitud);
+@
+@ Parametros recibidos:
+@   r0: *vectorIn
+@	r1: longitud
+
+.thumb_func
+
+	invertir_asm:
+		PUSH {R4}
+		MOV  R2, #2
+		RSB  R3,R2,R1,LSL #1
+		MOV  R1,R1,LSR #1
+	loop7:
+		LDRH R4, [R0,R3]
+		LDRH R2, [R0]
+		STRH R2, [R0,R3]
+		MOV  R2, R4
+		STRH R2, [R0],#+2
+		SUB  R3, #4
+		SUBS R1,#1
+		BNE  loop7
+		POP {R4}
+		BX 	 lr
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void corr_asm (int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr, uint32_t longitud);
+@
+@ Parametros recibidos:
+@   r0: *vectorX
+@   r1: *vectorY
+@	r2: *vectorCorr
+@   r3: longitud
+@
+
+.thumb_func
+	corr_asm:
+		PUSH {R4-R10}
+
+		MVN  R4, R3
+		ADD  R4, #2		//R4=demora
+	loop15:
+
+		CMP  R4, R3
+		BGE	 salirrr
+		MOV  R5, #0		//R5=sxy
+	for2:
+		MOV  R6, #0		//R6=i
+	loopfor2:
+		CMP  R6,R3
+		BGE	 ciclo2
+		MOV  R7, R6
+		ADD  R7, R4
+		CMP  R7, #0
+		BLT  volver22
+		CMP  R7, R3
+		BGE  volver22
+		LDRH R8, [R0,R6,LSL #1]
+		LDRH R10,[R1,R7,LSL #1]
+		MUL  R8, R10
+		ADD  R5, R8
+	volver22:
+		ADD  R6, #1
+		B	 loopfor2
+	ciclo2:
+		CMP	 R4,#1
+		BGE	 nohago
+		MOV  R9, R3
+		SUB  R9, #1
+		ADD  R9, R4
+		STRH R5, [R2,R9,LSL #1]
+	nohago:
+		ADD  R4, #1
+		B	loop15
+	salirrr:
+		POP {R4-R10}
+		BX 	 lr
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Prototipo en "C":
+@   void eco_asm (int16_t *vectorX,int16_t *vectorY,uint32_t longitud);
+@
+@ Parametros recibidos:
+@   r0: *vectorX
+@   r1: *vectorY
+@	r2: longitud
+@
+
+.equ RATE_ASM, 44100 //muestras por mili segundo
+.equ TIEMPO_ASM, 50
+.equ MUESTRA_EQU_ASM, 882
+
+
+.thumb_func
+	eco_asm:
+		PUSH {R4-R7}
+
+		MOV  R3, #0
+		MOV  R5, #0
+	loop14:
+
+		CMP  R3, R2
+		BEQ  salir14
+		LDRH R4, [R0,R3,LSL #1]
+		STRH R4, [R1,R3,LSL #1]
+		MOV  R7, #882
+		CMP  R3, #2
+		BLO  salto14
+		LDRH R6, [R0,R5,LSL #1]
+		MOV  R6, R6, LSR #1
+		ADD  R4, R6
+		STRH R4, [R1,R3,LSL #1]
+		ADD  R5, #1
+	salto14:
+		ADD  R3, #1
+		B	loop14
+	salir14:
+		POP {R4-R7}
+		BX 	 lr
+
+
